@@ -5,14 +5,14 @@ Het project draait op de **PSoC 6 Pioneer Kit (CY8CKIT-062-WiFi-BT)** met **ST77
 
 ---
 
-## 📥 Download
+## Download
 
-➡️ Voor de complete ModusToolbox-projectbestanden (ZIP):  
-Ga naar de **[Releases](https://github.com/RunarJans/Project_PEN2/releases/tag/v1.0.0)** pagina van de repo en download de laatste release-asset.
+Voor de complete ModusToolbox-projectbestanden (ZIP):  
+Ga naar de [Releases](https://github.com/RunarJans/Project_PEN2/releases/tag/v1.0.0) pagina van de repo en download de laatste release-asset.
 
 ---
 
-## ⚙️ Bestanden & structuur
+## Bestanden & structuur
 
 Belangrijkste bronbestand: **`tft_task.c`**.  
 Verder in de repo:
@@ -37,11 +37,11 @@ Verder in de repo:
 
 ---
 
-## 🔌 Pinnen & constanten
+## Pinnen & constanten
 
-- **ADC_INPUT_PIN** = `P10_0` → gedeeld voor **osc/voltmeter/weerstand**.  
-- **BTN_PIN** = `CYBSP_USER_BTN` → **kort** = volgende modus, **lang** = T/div wisselen.  
-- **CONTINUITY_PIN** = `P10_6` → input met pull-up; **LOW = contact**.  
+- **ADC_INPUT_PIN** = `P10_0` → gedeeld voor osc/voltmeter/weerstand.  
+- **BTN_PIN** = `CYBSP_USER_BTN` → korte druk = volgende modus, lange druk = T/div wisselen.  
+- **CONTINUITY_PIN** = `P10_6` → input met pull-up; LOW = contact.  
 - **DPIN_TEST_PIN** = `P13_6` → output-toggle + teruglezen.  
 - **DPIN_MONITOR_PIN** = `P13_7` → pure input-monitor.
 
@@ -52,17 +52,14 @@ ADC-kalibratie (pas aan op jouw board):
 #define V_MIN   0.02f
 #define V_MAX   3.27f
 ```
-→ hiermee mapt `adc_raw_to_v()` de ADC-raw naar volt.
 
-I²C (100 kHz) gebruikt **P6_0 (SCL)** en **P6_1 (SDA)** voor de scanner.
-
-Display: **320×240**, oscilloscoop gebruikt **320 samples** breed.
-
-Sample-timer: **max 100 kHz**, start op **20 kHz**.
+I²C (100 kHz) gebruikt **P6_0 (SCL)** en **P6_1 (SDA)** voor de scanner.  
+Display: 320×240, oscilloscoop gebruikt 320 samples breed.  
+Sample-timer: maximaal 100 kHz, start op 20 kHz.
 
 ---
 
-## 🧠 Globale state & buffers
+## Globale state & buffers
 
 - `g_mode` → actieve UI-modus.  
 - `g_ms_div_presets` → T/div presets (0.25–10 ms/div).  
@@ -71,7 +68,7 @@ Sample-timer: **max 100 kHz**, start op **20 kHz**.
 
 ---
 
-## 📟 TFT initialisatie & tekenen
+## TFT initialisatie & tekenen
 
 Initialisatie:
 ```c
@@ -81,14 +78,14 @@ GUI_SetBkColor(GUI_BLACK);
 GUI_Clear();
 ```
 
-Tekenen van UI:
-- **`header(left, right)`** → zwarte balk met witte tekst.  
-- **`draw_grid()`** → rasterlijnen voor scope.  
-- Scope-trace: met **`GUI_DrawLine()`** tussen opeenvolgende samples.
+UI-elementen:
+- `header(left, right)` → zwarte balk met witte tekst.  
+- `draw_grid()` → rasterlijnen voor scope.  
+- Scope-trace: `GUI_DrawLine()` tussen opeenvolgende samples.
 
 ---
 
-## ⏱ Sample-timer & T/div
+## Sample-timer & T/div
 
 ```c
 cyhal_timer_init(&s_sample_tmr, NC, NULL);
@@ -96,98 +93,81 @@ cyhal_timer_set_frequency(&s_sample_tmr, hz);
 cyhal_timer_register_callback(&s_sample_tmr, isr_sample, NULL);
 cyhal_timer_enable_event(&s_sample_tmr, CYHAL_TIMER_IRQ_TERMINAL_COUNT, 7, true);
 ```
-- De ISR zet `s_sample_tick = true`.  
-- **`apply_timebase()`** berekent **Fs** op basis van het venster (10 divisies × ms/div) zodat de scopebreedte (320 punten) netjes de gekozen T/div bestrijkt.
+
+De ISR zet `s_sample_tick = true`.  
+`apply_timebase()` berekent Fs op basis van het venster (10 divisies × ms/div) zodat de scopebreedte (320 punten) overeenkomt met de gekozen T/div.
 
 ---
 
-## 🧮 ADC-helpers
+## ADC-helpers
 
-- **`adc_read_avg10()`**: gemiddelde van 10 samples voor **rustige metingen** (voltmeter/weerstand).  
-- **`cyhal_adc_read()`** direct: voor **scherpe edges** in de scope/PWM-scope.  
-- **`adc_raw_to_v()`**: mapt raw → volt via jouw kalibratie.
-
----
-
-## 🔘 Button-logica
-
-- **Korte druk** → volgende modus (met wrap naar eerste).  
-- **Lange druk (>700 ms)** → volgende **T/div preset** en herconfigureer sample-timer.  
-Debounce met `DEBOUNCE_MS`.
+- `adc_read_avg10()` → gemiddelde van 10 samples (rustige metingen).  
+- `cyhal_adc_read()` → directe sample (scherpe edges, PWM).  
+- `adc_raw_to_v()` → raw ADC → volt via kalibratie.
 
 ---
 
-## 📊 Modus-implementaties
+## Button-logica
+
+- **Korte druk**: volgende modus (wrap naar begin).  
+- **Lange druk (>700 ms)**: volgende T/div preset, herconfigureert sample-timer.  
+- Debounce met `DEBOUNCE_MS`.
+
+---
+
+## Modus-implementaties
 
 ### 1) Oscilloscoop – `mode_osc_step()`
-- Leest ADC (gemiddeld) en schrijft naar `s_scope_buf`.  
-- Wanneer de buffer vol is: scherm wissen, grid tekenen en trace tekenen.  
-- Rechtsboven toont `format_right_header()` de **T/div** en **Fs**.
+Leest ADC, vult buffer, tekent grid en trace. Toont T/div en Fs in header.
 
 ### 2) PWM-scope – `mode_osc_pwm_step()`
-- Externe PWM op **`P10_0`** (denk aan **GND↔GND**).  
-- Bij eerste keer wordt T/div kort gezet (0.5 ms/div) via `apply_timebase()`.  
-- Leest samples zonder averaging.  
-- Berekent:
-  - **`vmax`/`vmin`** → **`Vpp`** en **`Vhigh`**.  
-  - Twee **stijgende flanken** met hysterese → **periode** → **frequentie**.  
-  - **Duty-cycle** uit `high_samples / period_samples`.  
-- Toont trace + overlay: **f**, **duty**, **Vhigh**, **Vpp**.  
-  > Als geen stabiele edges: hint om T/div te verkorten of signaal te checken.
+Externe PWM op P10_0. Analyseert frequentie, duty-cycle, Vpp, Vhigh en toont overlay.
 
 ### 3) Spanningsmeter – `mode_volt_step()`
-- Gemiddelde van 10 samples.  
-- Tekst met **V** + blauwe **balk** (0–VCC).
+Meet spanning, toont waarde in V en blauwe balkmeter.
 
 ### 4) Weerstandsmeter – `mode_res_step()`
-- Schema: `3V3 —[Rref]—●—[Rx]—GND`, ADC meet in de **node ●**.  
-- Formule: `Rx = Rref * Vnode / (Vcc − Vnode)`.  
-- Toont automatisch in Ω, kΩ of MΩ, met open/short detectie.
+Meet Rx via spanningsdeler. Toont in Ω, kΩ of MΩ met open/short detectie.
 
 ### 5) Continuïteit – `mode_cont_step()`
-- Init `P10_6` als **INPUT_PULLUP** (1).  
-- **LOW** → “Contact!” in groen, anders “Geen contact” in rood.
+LOW op P10_6 = contact. Toont in groen/rood.
 
 ### 6) I²C-scanner – `mode_i2c_step()`
-- Init I²C master op 100 kHz.  
-- Loopt adressen **0x08..0x77** af, probeert 0-byte write of 1-byte read.  
-- Tekent 8×16 tabel met **gevonden adressen**.
+Probeert adressen 0x08–0x77, toont tabel met gevonden devices.
 
 ### 7) Digital Pin Tester – `mode_dpin_step()`
-- `P13_6` als **output**, toggelt elke 500 ms.  
-- Lees hem **kort als input** (met pull-up) om de status te tonen.  
-- Zet hem terug als output (met huidige state).
+Toggelt P13_6 elke 500 ms en leest status terug.
 
 ### 8) Digital Pin Monitor – `mode_dpin_monitor_step()`
-- `P13_7` als **INPUT_PULLUP**.  
-- Toont live HIGH/LOW.
+Toont status van P13_7 live (HIGH/LOW).
 
 ---
 
-## 🔄 FreeRTOS-taak
+## FreeRTOS-taak
 
-Hoofdloop kiest per `g_mode` de juiste `mode_*_step()` en voegt kleine `vTaskDelay()` toe per modus om CPU/TFT te sparen.  
-Tussen de calls door geeft `taskYIELD()` andere taken kans (als aanwezig).
-
----
-
-## 🧪 Test-tips
-
-- **Oscilloscoop/PWM**: hang een PWM-bron op `P10_0`, verbind **GND↔GND**.  
-- **Voltmeter**: gebruik de potmeter op de ADC-ingang.  
-- **Weerstand**: meet via spanningsdeler met bekende `Rref`.  
-- **I²C**: sluit bijv. **BMP280 (0x76/0x77)** aan met pull-ups naar 3V3.
+De hoofdtaak selecteert op basis van `g_mode` de juiste `mode_*_step()`.  
+Elke modus heeft een korte `vTaskDelay()` om CPU en TFT te sparen.  
+`taskYIELD()` geeft andere FreeRTOS-taken de kans om te draaien.
 
 ---
 
-## 🔗 Verwante bestanden
+## Test-tips
+
+- Oscilloscoop/PWM: verbind externe PWM met P10_0 en GND↔GND.  
+- Voltmeter: gebruik de potmeter op het shield.  
+- Weerstand: meet via spanningsdeler met bekende Rref.  
+- I²C: sluit BMP280 aan (adres 0x76/0x77) met 4.7k pull-ups.
+
+---
+
+## Verwante bestanden
 
 - Hardwareuitleg: [`../hardware/hardware.md`](../hardware/hardware.md)  
 - Foto’s per modus: [`../pictures/`](../pictures)  
-- Releases/ZIP-download: zie **[Releases](https://github.com/RunarJans/Project_PEN2/releases/tag/v1.0.0)**
+- Release ZIP-download: [Releases](https://github.com/RunarJans/Project_PEN2/releases/tag/v1.0.0)
 
 ---
 
-## ✅ Samenvatting
+## Samenvatting
 
-Deze code laat zien hoe je met **PSoC6 + FreeRTOS + emWin** een compacte **multimeter + oscilloscoop + I²C-scanner + digitale pin-tools** bouwt met een geïntegreerd TFT-scherm.
+Deze code demonstreert hoe je met **PSoC6, FreeRTOS en emWin** een geïntegreerde multimeter, oscilloscoop, I²C-scanner en digitale pin-tools op een TFT-scherm kunt realiseren.
