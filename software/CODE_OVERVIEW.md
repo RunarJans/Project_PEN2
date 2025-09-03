@@ -184,7 +184,7 @@ Tussen de calls door geeft `taskYIELD()` andere taken kans (als aanwezig).
 
 - Hardwareuitleg: [`../hardware/hardware.md`](../hardware/hardware.md)  
 - Foto’s per modus: [`../pictures/`](../pictures)  
-- Releases/ZIP-download: zie **[Releases](../../releases)**
+- Releases/ZIP-download: zie **[Releases](https://github.com/RunarJans/Project_PEN2/releases/tag/v1.0.0)**
 
 ---
 
