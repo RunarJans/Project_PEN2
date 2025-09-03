@@ -8,7 +8,7 @@ Het project draait op de **PSoC 6 Pioneer Kit (CY8CKIT-062-WiFi-BT)** met **ST77
 ## 📥 Download
 
 ➡️ Voor de complete ModusToolbox-projectbestanden (ZIP):  
-Ga naar de **[Releases](../../releases)** pagina van de repo en download de laatste release-asset.
+Ga naar de **[Releases](https://github.com/RunarJans/Project_PEN2/releases/tag/v1.0.0)** pagina van de repo en download de laatste release-asset.
 
 ---
 
