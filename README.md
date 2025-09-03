@@ -60,6 +60,4 @@ make program
 
 ---
 
-## Licentie
 
-Kies en voeg een licentie toe (bijv. MIT of BSD-3-Clause).
