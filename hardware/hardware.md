@@ -28,8 +28,6 @@ Dit document beschrijft alle gebruikte hardware, de rol in het project, relevant
 - Dual‑core PSoC 6, 12‑bit SAR‑ADC, GPIO met interne pull‑ups, I²C‑hardware.  
 - Voeding 3.3 V logica – **max 3.3 V op ADC-ingang**.
 
-**Gerelateerde screenshot**  
-![Oscilloscoop-modus](../pictures/modus_osci.png)
 
 ---
 
@@ -103,9 +101,6 @@ Dit document beschrijft alle gebruikte hardware, de rol in het project, relevant
 **Aansluiten**  
 - **P13_6 → LED → serieweerstand (330 Ω–1 kΩ) → GND**.
 
-**Gerelateerde screenshots**  
-- Output‑test: ![Digital Pin OUT](../pictures/modus_digpin_out.png)  
-- Input‑monitor: ![Digital Pin IN](../pictures/modus_digpin_in.png)
 
 ---
 
@@ -114,8 +109,6 @@ Dit document beschrijft alle gebruikte hardware, de rol in het project, relevant
 **Functie in project**  
 - Snel prototypen: spanningsdeler voor weerstandsmeter, potmeter‑opstelling, verbindingen naar ADC/I²C/GPIO.
 
-**Gerelateerde screenshot**  
-![Continuïteitstest](../pictures/modus_continu.png)
 
 ---
 
