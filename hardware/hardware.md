@@ -133,3 +133,9 @@ Gerelateerde screenshots:
 - Code‑uitleg: [`../software/CODE_OVERVIEW.md`](../software/CODE_OVERVIEW.md)  
 - Map met alle afbeeldingen: [`../pictures/`](../pictures)  
 - Hoofd‑README (project): [`../README.md`](../README.md)
+
+
+Elektrisch schema 
+<img width="721" height="447" alt="image" src="https://github.com/user-attachments/assets/72aebf4f-c8a1-4a11-84c7-9e2128d8da09" />
+
+
