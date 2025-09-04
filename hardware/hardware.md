@@ -136,6 +136,7 @@ Gerelateerde screenshots:
 
 
 Elektrisch schema 
-<img width="721" height="447" alt="image" src="https://github.com/user-attachments/assets/72aebf4f-c8a1-4a11-84c7-9e2128d8da09" />
+<img width="657" height="351" alt="image" src="https://github.com/user-attachments/assets/8804e8cb-4362-4a98-ba8c-c1995014b54f" />
+
 
 
